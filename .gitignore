@@ -1,0 +1,6 @@
+﻿work/
+*.wlf
+*.vcd
+sim_log.txt
+report.html
+transcript
