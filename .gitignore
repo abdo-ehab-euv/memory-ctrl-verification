@@ -1,6 +1,27 @@
-﻿work/
-*.wlf
-*.vcd
-sim_log.txt
-report.html
+﻿# ModelSim / Questa
+work/
 transcript
+vsim.wlf
+vsim.dbg
+modelsim.ini
+*.vstf
+*.mti
+.qsf.lock
+
+# Simulation outputs
+waveform.vcd
+*.log
+reports/*
+!reports/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+.DS_Store
