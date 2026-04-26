@@ -15,6 +15,7 @@ Built as a hardware-verification portfolio project for HAV / DV internships.
   pass/fail and coverage.
 
 ## Folder structure
+
 ├── rtl/                # DUTs (clean + buggy)
 ├── tb/
 │   ├── simple/         # Original task-based testbench
@@ -26,6 +27,7 @@ Built as a hardware-verification portfolio project for HAV / DV internships.
 ├── .github/workflows/  # CI (Python checks; SV needs self-hosted runner)
 ├── requirements.txt
 └── README.md
+
 ## Simulator requirements
 
 | Flow            | Simulator                                   |
@@ -102,14 +104,6 @@ In the bug waveform, the DUT stores the corrupted value at address 7 while the t
 - Functional coverage with covergroups, cross coverage, and transition coverage.
 - TCL automation, log parsing, HTML reporting.
 - A reproducible bug-injection / detection / fix loop.
-
-## Interview talking points
-
-- **"Walk me through your scoreboard."** Analysis-imp subscriber, shadow memory updated on writes, equality check on reads, prints regex-parseable PASS/FAIL.
-- **"Why both directed and random?"** Directed tests prove specific requirements (reset, overwrite, all-addresses). Random tests explore unexpected combinations — that's how the bug demo finds the addr-7 corruption it wasn't told to look for.
-- **"What's the role of `tb_valid`?"** TB-only signal pulsed by the driver so the monitor only emits transactions that the test actually scheduled. Avoids false reads being scored when the bus is idle.
-- **"How did you separate the buggy DUT?"** Same ports, different module name (`memory_ctrl_buggy`). `tb_top_uvm` selects via `` `ifdef USE_BUGGY_DUT ``; the bug-run TCL adds `+define+USE_BUGGY_DUT` and compiles the buggy file.
-- **"What's the difference between your env and full UVM?"** The pieces are real UVM components — agent/env/test/scoreboard/coverage. What I'd add next: register-abstraction layer (RAL), virtual sequencer, layered tests, coverage closure tracking across runs.
 
 ## Troubleshooting
 
