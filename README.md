@@ -63,7 +63,7 @@ memory-ctrl-verification/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
-```text
+```
 
 ## Simulator requirements
 
