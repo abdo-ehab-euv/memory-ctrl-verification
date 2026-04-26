@@ -16,18 +16,53 @@ Built as a hardware-verification portfolio project for HAV / DV internships.
 
 ## Folder structure
 
-├── rtl/                # DUTs (clean + buggy)
+```text
+memory-ctrl-verification/
+├── .github/
+│   └── workflows/
+│       └── regression.yml
+├── docs/
+│   ├── img/
+│   │   ├── bug_run_dashboard.png
+│   │   ├── clean_run_dashboard.png
+│   │   ├── waveform_addr7_bug.png
+│   │   └── waveform_reset.png
+│   ├── architecture.md
+│   ├── results_template.md
+│   └── verification_plan.md
+├── reports/
+│   └── .gitkeep
+├── rtl/
+│   ├── memory_ctrl.sv
+│   └── memory_ctrl_buggy.sv
+├── scripts/
+│   ├── clean.ps1
+│   ├── run_simple.tcl
+│   ├── run_uvm.tcl
+│   └── run_uvm_bug.tcl
 ├── tb/
-│   ├── simple/         # Original task-based testbench
-│   └── uvm/            # UVM environment
-├── scripts/            # TCL + PowerShell automation
-├── tools/              # Python regression + dashboard
-├── reports/            # Generated logs + HTML report (gitignored)
-├── docs/               # Verification plan, architecture, results template
-├── .github/workflows/  # CI (Python checks; SV needs self-hosted runner)
-├── requirements.txt
-└── README.md
-
+│   ├── simple/
+│   │   ├── mem_test.sv
+│   │   └── tb_top.sv
+│   └── uvm/
+│       ├── mem_agent.sv
+│       ├── mem_base_test.sv
+│       ├── mem_coverage.sv
+│       ├── mem_driver.sv
+│       ├── mem_env.sv
+│       ├── mem_if.sv
+│       ├── mem_monitor.sv
+│       ├── mem_scoreboard.sv
+│       ├── mem_seq_item.sv
+│       ├── mem_sequence.sv
+│       ├── mem_uvm_pkg.sv
+│       └── tb_top_uvm.sv
+├── tools/
+│   ├── dashboard.py
+│   └── regression.py
+├── .gitignore
+├── README.md
+└── requirements.txt
 ## Simulator requirements
 
 | Flow            | Simulator                                   |
