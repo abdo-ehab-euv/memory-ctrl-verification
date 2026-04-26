@@ -75,10 +75,23 @@ dashboard surfaces the offending checks under "Failing checks".
 
 ## Screenshots
 
-docs/img/clean_run_dashboard.png      ← the PASS dashboard
-docs/img/bug_run_dashboard.png        ← the FAIL dashboard with addr-7 fails
-docs/img/waveform_reset.png           ← waveform showing clean reset
-docs/img/waveform_addr7_bug.png       ← waveform highlighting the corrupted write
+### Clean Regression Dashboard
+
+![Clean run dashboard](docs/img/clean_run_dashboard.png)
+
+### Bug Regression Dashboard
+
+![Bug run dashboard](docs/img/bug_run_dashboard.png)
+
+### Clean Reset Waveform
+
+![Clean reset waveform](docs/img/waveform_reset.png)
+
+### Intentional Address-7 Bug Waveform
+
+![Address 7 bug waveform](docs/img/waveform_addr7_bug.png)
+
+In the bug waveform, the DUT stores the corrupted value at address 7 while the testbench shadow memory keeps the expected value, so the self-checking testbench increments `fail_count`.
 
 ## What this project demonstrates
 
