@@ -1,5 +1,9 @@
 // ============================================================
-// tb/uvm/mem_agent.sv  -  Bundles sequencer, driver, monitor.
+// tb/uvm/mem_agent.sv — UVM Agent
+// ------------------------------------------------------------
+// Bundles the sequencer, driver, and monitor into a single
+// reusable agent component. Connects the driver's seq_item_port
+// to the sequencer's seq_item_export in the connect phase.
 // ============================================================
 
 typedef uvm_sequencer #(mem_seq_item) mem_sequencer;
@@ -11,7 +15,9 @@ class mem_agent extends uvm_agent;
     mem_driver    driver;
     mem_monitor   monitor;
 
-    function new(string name, uvm_component parent); super.new(name, parent); endfunction
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
 
     function void build_phase(uvm_phase phase);
         sequencer = mem_sequencer::type_id::create("sequencer", this);
@@ -22,4 +28,5 @@ class mem_agent extends uvm_agent;
     function void connect_phase(uvm_phase phase);
         driver.seq_item_port.connect(sequencer.seq_item_export);
     endfunction
+
 endclass

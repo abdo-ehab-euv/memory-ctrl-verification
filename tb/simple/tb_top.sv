@@ -1,16 +1,21 @@
 // ============================================================
-// tb_top.sv
-// Testbench top: clock gen, reset, DUT instance, VCD dump,
-// shadow memory, test orchestrator. Includes mem_test.sv which
-// provides all test tasks.
+// tb/simple/tb_top.sv — Simple Testbench Top Module
+// ------------------------------------------------------------
+// Task-based testbench (no UVM). Provides:
+//   - Clock generation (10 MHz)
+//   - Reset sequence
+//   - DUT instantiation
+//   - Shadow memory for self-checking
+//   - Test orchestration via included mem_test.sv tasks
+//   - VCD waveform dump
 // ============================================================
 `timescale 1ns/1ps
 
 module tb_top;
 
-    // -----------------------------
+    // ---------------------------------------------------------
     // DUT I/O signals
-    // -----------------------------
+    // ---------------------------------------------------------
     logic       clk;
     logic       rst_n;
     logic       we;
@@ -19,16 +24,16 @@ module tb_top;
     logic [7:0] dout;
     logic       ready;
 
-    // -----------------------------
+    // ---------------------------------------------------------
     // Self-checking infrastructure
-    // -----------------------------
-    logic [7:0] shadow_mem [0:7];  // Golden reference
+    // ---------------------------------------------------------
+    logic [7:0] shadow_mem [0:7];   // Golden reference model
     int         pass_count;
     int         fail_count;
 
-    // -----------------------------
+    // ---------------------------------------------------------
     // DUT instance
-    // -----------------------------
+    // ---------------------------------------------------------
     memory_ctrl dut (
         .clk   (clk),
         .rst_n (rst_n),
@@ -39,37 +44,37 @@ module tb_top;
         .ready (ready)
     );
 
-    // -----------------------------
-    // 10 MHz clock -> period = 100 ns
-    // -----------------------------
+    // ---------------------------------------------------------
+    // Clock generation — 10 MHz (period = 100 ns)
+    // ---------------------------------------------------------
     initial clk = 1'b0;
     always  #50 clk = ~clk;
 
-    // -----------------------------
+    // ---------------------------------------------------------
     // Waveform dump (VCD)
-    // -----------------------------
+    // ---------------------------------------------------------
     initial begin
         $dumpfile("waveform.vcd");
         $dumpvars(0, tb_top);
     end
 
-    // -----------------------------
+    // ---------------------------------------------------------
     // Test tasks (inline include)
-    // -----------------------------
+    // ---------------------------------------------------------
     `include "mem_test.sv"
 
-    // -----------------------------
+    // ---------------------------------------------------------
     // Simulation watchdog
-    // -----------------------------
+    // ---------------------------------------------------------
     initial begin
-        #2000000;  // 2 ms hard limit
+        #2000000;   // 2 ms hard limit
         $display("ERROR: simulation timeout reached.");
         $finish;
     end
 
-    // -----------------------------
+    // ---------------------------------------------------------
     // Main stimulus sequence
-    // -----------------------------
+    // ---------------------------------------------------------
     initial begin
         int k;
 
@@ -84,7 +89,8 @@ module tb_top;
         din        = 8'h00;
         pass_count = 0;
         fail_count = 0;
-        for (k = 0; k < 8; k = k + 1) shadow_mem[k] = 8'h00;
+        for (k = 0; k < 8; k = k + 1)
+            shadow_mem[k] = 8'h00;
 
         // Hold reset for 5 clock cycles
         repeat (5) @(posedge clk);
@@ -93,14 +99,10 @@ module tb_top;
         $display("[%0t] Reset released. ready=%0b", $time, ready);
         @(posedge clk);
 
-        // -----------------------------
         // Run all tests
-        // -----------------------------
         run_all_tests();
 
-        // -----------------------------
-        // Final summary (human-readable)
-        // -----------------------------
+        // Final summary
         $display("=============================================");
         $display("  TEST SUMMARY");
         $display("  PASSED : %0d", pass_count);

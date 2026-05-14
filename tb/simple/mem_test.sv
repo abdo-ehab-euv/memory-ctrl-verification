@@ -1,14 +1,19 @@
 // ============================================================
-// mem_test.sv
-// SystemVerilog task library - INCLUDED inside tb_top.
-// Provides helper tasks + directed tests (T1..T5) +
+// tb/simple/mem_test.sv — Test Task Library
+// ------------------------------------------------------------
+// SystemVerilog task library — INCLUDED inside tb_top.
+// Provides helper tasks + directed tests (T1–T5) +
 // constrained-random test (50 ops) with shadow-memory checking.
 //
 // IMPORTANT: This file is `included, NOT separately compiled.
 // Do NOT add `timescale or module headers here.
 // ============================================================
 
-// --------- Reporting helpers ---------
+
+// ==========================================================
+// Reporting helpers
+// ==========================================================
+
 task automatic print_pass(input string test_name);
     $display("PASS %0s", test_name);
     pass_count = pass_count + 1;
@@ -22,8 +27,12 @@ task automatic print_fail(input string       test_name,
     fail_count = fail_count + 1;
 endtask
 
-// --------- Driver helpers ---------
-// Drive one write transaction and update the shadow memory.
+
+// ==========================================================
+// Driver helpers
+// ==========================================================
+
+// Drive one write transaction and update the shadow memory
 task automatic write_mem(input logic [2:0] a, input logic [7:0] d);
     @(negedge clk);
     we   = 1'b1;
@@ -35,7 +44,7 @@ task automatic write_mem(input logic [2:0] a, input logic [7:0] d);
     shadow_mem[a] = d;        // Keep shadow in sync
 endtask
 
-// Drive a read, compare against an expected value and report.
+// Drive a read, compare against expected value and report
 task automatic read_check(input logic [2:0] a,
                           input logic [7:0] expected,
                           input string      test_name);
@@ -49,7 +58,7 @@ task automatic read_check(input logic [2:0] a,
         print_fail(test_name, expected, dout);
 endtask
 
-// Apply a clean in-test reset and also wipe the shadow
+// Apply a clean in-test reset and wipe the shadow
 task automatic apply_reset();
     int k;
     @(negedge clk);
@@ -58,20 +67,22 @@ task automatic apply_reset();
     @(negedge clk);
     rst_n = 1'b1;
     @(posedge clk);
-    for (k = 0; k < 8; k = k + 1) shadow_mem[k] = 8'h00;
+    for (k = 0; k < 8; k = k + 1)
+        shadow_mem[k] = 8'h00;
 endtask
 
-// ============================================================
-// Directed tests
-// ============================================================
 
-// T1: write 0xFF to addr 0 and read it back
+// ==========================================================
+// Directed tests
+// ==========================================================
+
+// T1: Write 0xFF to addr 0 and read it back
 task automatic test_T1_basic();
     write_mem(3'd0, 8'hFF);
     read_check(3'd0, 8'hFF, "T1_basic_write_read");
 endtask
 
-// T2: write all 8 addresses with distinct data, read each back
+// T2: Write all 8 addresses with distinct data, read each back
 task automatic test_T2_all_addresses();
     logic [7:0] data_arr [0:7];
     string      tname;
@@ -95,7 +106,7 @@ task automatic test_T2_all_addresses();
     end
 endtask
 
-// T3: overwrite the same address and confirm latest value
+// T3: Overwrite the same address and confirm latest value
 task automatic test_T3_overwrite();
     write_mem(3'd3, 8'h11);
     write_mem(3'd3, 8'h22);
@@ -103,7 +114,7 @@ task automatic test_T3_overwrite();
     read_check(3'd3, 8'h33, "T3_overwrite_addr3");
 endtask
 
-// T4: reset after writing -> confirm memory cleared
+// T4: Reset after writing — confirm memory cleared
 task automatic test_T4_reset_clears();
     write_mem(3'd2, 8'hAA);
     write_mem(3'd5, 8'h55);
@@ -112,7 +123,7 @@ task automatic test_T4_reset_clears();
     read_check(3'd5, 8'h00, "T4_reset_clears_addr5");
 endtask
 
-// T5: read every address after reset -> confirm all 0x00
+// T5: Read every address after reset — confirm all 0x00
 task automatic test_T5_read_after_reset();
     string tname;
     int    i;
@@ -123,9 +134,11 @@ task automatic test_T5_read_after_reset();
     end
 endtask
 
-// ============================================================
+
+// ==========================================================
 // Constrained-random test (50 ops)
-// ============================================================
+// ==========================================================
+
 task automatic test_random_50();
     logic [2:0] r_addr;
     logic [7:0] r_data;
@@ -148,9 +161,11 @@ task automatic test_random_50();
     end
 endtask
 
-// ============================================================
-// Orchestrator
-// ============================================================
+
+// ==========================================================
+// Orchestrator — runs all tests in order
+// ==========================================================
+
 task automatic run_all_tests();
     $display("--- Running directed tests ---");
     test_T1_basic();

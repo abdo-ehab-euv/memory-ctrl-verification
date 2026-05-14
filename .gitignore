@@ -1,4 +1,8 @@
-﻿# ModelSim / Questa
+# =============================================================
+# .gitignore — SRAM Controller UVM Verification
+# =============================================================
+
+# ModelSim / Questa build artifacts
 work/
 transcript
 vsim.wlf
@@ -6,22 +10,26 @@ vsim.dbg
 modelsim.ini
 *.vstf
 *.mti
+*.wlf
+*.vcd
 .qsf.lock
 
-# Simulation outputs
-waveform.vcd
-*.log
+# Simulation outputs (keep .gitkeep for empty dirs)
 reports/*
 !reports/.gitkeep
 
 # Python
 __pycache__/
 *.pyc
+*.pyo
 .venv/
 venv/
+.pytest_cache/
 
-# Editors
+# Editors / IDEs
 .vscode/
 .idea/
 *.swp
+*~
 .DS_Store
+Thumbs.db

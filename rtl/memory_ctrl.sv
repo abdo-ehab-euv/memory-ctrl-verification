@@ -1,13 +1,11 @@
 // ============================================================
-// memory_ctrl.sv
-// 8-location x 8-bit SRAM memory controller (DUT)
+// memory_ctrl.sv — Clean Golden DUT
+// 8-location × 8-bit SRAM memory controller
 // ------------------------------------------------------------
-// - Synchronous write (posedge clk)
-// - Combinational read
-// - Active-low async reset clears all memory to 8'h00
-// - ready = 0 in reset, 1 after reset release
-// - Compile with +define+INJECT_BUG to enable the subtle bug
-//   used for debug practice with regression.py
+// - Synchronous write  (posedge clk)
+// - Combinational read (dout = mem[addr])
+// - Active-low asynchronous reset clears all memory to 8'h00
+// - ready = 0 during reset, 1 after reset release
 // ============================================================
 `timescale 1ns/1ps
 
@@ -21,10 +19,12 @@ module memory_ctrl (
     output logic       ready
 );
 
-    // Internal memory
+    // Internal 8×8 memory array
     logic [7:0] mem [0:7];
 
-    // Synchronous write + reset logic
+    // --------------------------------------------------------
+    // Synchronous write + asynchronous active-low reset
+    // --------------------------------------------------------
     always_ff @(posedge clk or negedge rst_n) begin : mem_write
         int k;
         if (!rst_n) begin
@@ -36,24 +36,14 @@ module memory_ctrl (
         else begin
             ready <= 1'b1;
             if (we) begin
-`ifdef INJECT_BUG
-                // ---- INTENTIONAL BUG ----
-                // For addr == 3'd5 the controller writes to (addr+1)
-                // instead of addr. All other addresses behave correctly.
-                // This makes T2 fail at addr 5, and some random ops fail,
-                // while most tests still pass. Great for debug practice.
-                if (addr == 3'd5)
-                    mem[addr + 3'd1] <= din;
-                else
-                    mem[addr]        <= din;
-`else
                 mem[addr] <= din;
-`endif
             end
         end
     end
 
-    // Combinational read
+    // --------------------------------------------------------
+    // Combinational read — output follows addr immediately
+    // --------------------------------------------------------
     assign dout = mem[addr];
 
 endmodule

@@ -4,11 +4,11 @@
 # IMPORTANT: GitHub-hosted runners do NOT have ModelSim/Questa
 # installed (commercial licensed tools). This CI workflow does
 # the parts that DO work in CI:
+#
 #   1. Static checks on the Python tooling
-#   2. Sanity-runs regression.py + dashboard.py against the
-#      sample log committed under reports/sample_uvm_sim_log.txt
-#      (if present) so reviewers see the dashboard generates.
-#   3. Verifies the repo's expected folder structure.
+#   2. Sanity-runs regression.py + dashboard.py against a
+#      synthetic log so reviewers see the dashboard generates
+#   3. Verifies the repo's expected folder structure
 #
 # To run the actual SystemVerilog regression in CI you need a
 # self-hosted runner with Questa/ModelSim installed. A skeleton
@@ -19,7 +19,7 @@ name: regression
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
   workflow_dispatch:
 
@@ -28,6 +28,7 @@ jobs:
   python-and-structure:
     name: Python tooling + repo structure
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,15 +71,15 @@ jobs:
           done
           echo "All required files present."
 
-      - name: Build a synthetic log and exercise the tools
+      - name: Build synthetic log and exercise tools
         run: |
           mkdir -p reports
           cat > reports/sample_log.txt <<'EOF'
-# UVM_INFO @ 100: top.env.sb [SB] PASS read_chk1_addr0 expected=0x00 actual=0x00
-# UVM_INFO @ 200: top.env.sb [SB] PASS read_chk2_addr1 expected=0xa1 actual=0xa1
-# UVM_INFO @ 300: top.env.sb [SB] PASS read_chk3_addr7 expected=0x27 actual=0x27
-# UVM_INFO @ 400: top.env.cov [COV] COVERAGE_REPORT addr=100.0% op=100.0% data=100.0% cross=100.0% trans=100.0% overall=100.0%
-EOF
+          # UVM_INFO @ 100: top.env.sb [SB] PASS read_chk1_addr0 expected=0x00 actual=0x00
+          # UVM_INFO @ 200: top.env.sb [SB] PASS read_chk2_addr1 expected=0xa1 actual=0xa1
+          # UVM_INFO @ 300: top.env.sb [SB] PASS read_chk3_addr7 expected=0x27 actual=0x27
+          # UVM_INFO @ 400: top.env.cov [COV] COVERAGE_REPORT addr=100.0% op=100.0% data=100.0% cross=100.0% trans=100.0% overall=100.0%
+          EOF
           python tools/regression.py reports/sample_log.txt
           python tools/dashboard.py  reports/sample_log.txt
           test -f reports/dashboard.html
@@ -90,25 +91,28 @@ EOF
           name: dashboard
           path: reports/dashboard.html
 
-  # ----------------------------------------------------------
-  # OPTIONAL: real SV regression on a self-hosted runner.
+  # ------------------------------------------------------------
+  # OPTIONAL: Real SV regression on a self-hosted runner.
   # This job NEVER runs by default. To enable, register a
   # self-hosted runner with Questa installed and replace the
-  # `if: false` guard with `if: github.event_name == ...`.
-  # ----------------------------------------------------------
+  # `if: false` guard with your desired trigger condition.
+  # ------------------------------------------------------------
   sv-simulation-self-hosted:
     name: SV regression (self-hosted, optional)
     if: false   # disabled until you bring your own simulator
     runs-on: [self-hosted, questa]
     needs: python-and-structure
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Run UVM regression
         shell: bash
         run: |
           vsim -c -do scripts/run_uvm.tcl
           python tools/regression.py reports/uvm_sim_log.txt
           python tools/dashboard.py  reports/uvm_sim_log.txt
+
       - uses: actions/upload-artifact@v4
         with:
           name: uvm-dashboard
