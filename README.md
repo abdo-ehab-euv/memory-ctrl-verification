@@ -320,56 +320,5 @@ memory-ctrl-verification/
 └── requirements.txt                 # Python dependencies (tabulate)
 ```
 
----
 
-## DV Skills Demonstrated
-
-- **SystemVerilog testbench development** — RTL design, interfaces, packages, `always_ff`, `assign`
-- **UVM component architecture** — test, env, agent, sequencer, driver, monitor, scoreboard, coverage subscriber
-- **Transaction-level modeling** — `mem_seq_item` with `rand` fields, constraints, `uvm_field_*` macros, `convert2string`
-- **Constrained-random stimulus** — `uvm_do_with` inline constraints, `rand int unsigned` transaction count, multiple sequence types
-- **Self-checking scoreboard** — shadow memory reference model, automatic PASS/FAIL classification, `uvm_analysis_imp`
-- **Functional coverage** — coverpoints, cross coverage, transition coverage, `report_phase` summary
-- **Regression automation** — TCL scripts for compilation and simulation, Python log parser with regex-based extraction
-- **Failure triage and debug** — intentional bug injection, scoreboard error messages with expected/actual, dashboard failure listing
-- **TCL scripting** — parameterized compile flows, `+define+` DUT selection, transcript redirection, library management
-- **Python scripting** — regex log parsing, HTML report generation, CI-friendly exit codes, `tabulate` integration
-- **Waveform-based debug** — VCD dump enabled, waveform screenshots showing reset behavior and bug manifestation
-
----
-
-## Interview Talking Points
-
-1. **Why UVM?** — UVM provides a standardized, reusable verification architecture. The sequencer/driver/monitor split decouples stimulus generation from protocol driving and DUT observation, making it easy to add new tests without modifying infrastructure.
-
-2. **How the scoreboard works** — The scoreboard maintains a `shadow_mem[0:7]` array as a golden reference. On every write observed by the monitor, it updates the shadow. On every read, it compares `dout` against the shadow and reports PASS or FAIL. This is the same reference-model approach used in production ASIC verification.
-
-3. **How the bug demo proves the environment** — If a verification environment only ever sees passing tests, you can't be confident it would catch a real bug. The `memory_ctrl_buggy` DUT introduces a targeted data corruption at address 7. The scoreboard detects it, `regression.py` returns exit code 1, and the dashboard highlights the failing checks — end-to-end proof.
-
-4. **How coverage closure is approached** — The directed sequence guarantees all 8 addresses, both operations, and boundary data values are hit. The sequential sub-sequence exercises address transitions. The random sequence (120 transactions) fills remaining cross-coverage bins. The `report_phase` prints per-coverpoint percentages so gaps are immediately visible.
-
-5. **What I would add next** — SystemVerilog Assertions for protocol-level checks, code coverage merging from the simulator, parameterized DUT width/depth, an APB/AXI-Lite wrapper to verify a bus-accessible memory, and negative tests for invalid addresses or back-to-back resets.
-
----
-
-## Future Improvements
-
-- **SystemVerilog Assertions (SVA)** — add protocol-level assertions for write-to-read latency, reset-to-ready timing, and bus-hold conditions.
-- **Code coverage integration** — merge functional coverage with line/toggle/FSM coverage from the simulator for a unified closure report.
-- **GitHub Actions with self-hosted runner** — enable the `sv-simulation-self-hosted` CI job (already scaffolded in `regression.yml`) once a Questa-equipped runner is registered.
-- **APB/AXI-Lite wrapper** — wrap the memory controller with a standard bus interface to demonstrate protocol-level verification.
-- **Parameterized DUT** — make depth and width configurable, and scale the testbench coverage model accordingly.
-- **Negative / error-injection tests** — back-to-back resets, writes during reset, read-after-write hazard sequences.
-- **Coverage report export** — generate UCDB or XML coverage databases for use with Questa's coverage tools.
-- **Reusable verification package** — restructure into a reusable VIP-style package that can be dropped into other memory-controller projects.
-
----
-
-## CV Bullets
-
-> - Designed and implemented a **UVM verification environment** for an SRAM memory controller in SystemVerilog, including a constrained-random sequencer, shadow-memory scoreboard, and functional coverage model with address, data-class, cross, and transition coverpoints — achieving 100% coverage closure across directed and random stimulus.
-> - Built a **regression automation framework** with TCL simulation scripts, a Python log parser with CI-compatible exit codes, and an HTML dashboard; demonstrated end-to-end bug detection through intentional fault injection, scoreboard mismatch reporting, and failure triage using waveform analysis.
-
----
-
-<p align="center"><i>Built as a Design Verification portfolio project · SystemVerilog · UVM · Questa</i></p>
+<p align="center"><i>SystemVerilog · UVM · Questa</i></p>
