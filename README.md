@@ -402,41 +402,6 @@ sram-controller-uvm-verification/
 - `uvm_config_db` virtual interface distribution
 - Analysis port / analysis imp communication pattern
 
----
 
-## Interview Talking Points
-
-- **Why UVM?** UVM provides a standardized, reusable verification methodology. The class-based architecture allows the same environment to be reused across different tests and extended for more complex DUTs without rewriting infrastructure.
-
-- **How does the scoreboard work?** It maintains a `shadow_mem[0:7]` array that mirrors the DUT's expected state. Every write updates the shadow; every read compares `dout` against the shadow. This is a transaction-level reference model — the simplest form of the predict-and-compare pattern used in industry scoreboards.
-
-- **How does coverage map to the verification plan?** Each coverpoint directly traces to a DUT feature: `cp_addr` ensures all 8 locations are exercised (F1), `cp_op` ensures both reads and writes are tested (F2/F3), `cross_addr_op` ensures every address is both read and written, and `cp_trans` ensures back-to-back address patterns are covered.
-
-- **How does the bug demo prove the environment?** The buggy DUT corrupts writes to address 7 (`din ^ 0xFF`). The scoreboard catches every mismatch with expected/actual values. If the environment only passed clean tests, it could be a trivially permissive checker — the bug demo proves it has real detection capability.
-
-- **What would change at industry scale?** A real block-level environment would add SystemVerilog Assertions (SVA) for protocol checks, code coverage (line/toggle/FSM) merged with functional coverage, a register model (UVM RAL) for register-mapped interfaces, negative/error-injection tests, and multiple test classes extending a common base test.
-
----
-
-## Future Improvements
-
-- **SystemVerilog Assertions (SVA)**: Add inline assertions for reset behavior, ready protocol, and write-to-read latency.
-- **Code coverage**: Enable simulator code coverage (line, toggle, FSM) and merge with functional coverage reports.
-- **APB or AXI-Lite wrapper**: Wrap the SRAM controller with a standard bus interface to demonstrate protocol-level verification.
-- **Negative / error tests**: Add tests for out-of-range addresses, writes during reset, and back-pressure scenarios.
-- **Reusable UVM package structure**: Refactor into a proper `uvm_pkg` with parameterized components for reuse across different memory sizes.
-- **Self-hosted GitHub Actions**: Configure a self-hosted runner with Questa for automated SV regression in CI.
-- **Coverage database export**: Export UCDB/coverage databases for merging across multiple test runs.
-- **Waveform automation**: Add TCL scripts for automated waveform capture and annotation.
-
----
-
-## CV / Résumé Bullets
-
-> **SRAM Controller UVM Verification** — Designed and implemented a complete UVM verification environment for an 8×8 SRAM controller, including constrained-random stimulus generation, a self-checking shadow-memory scoreboard, and functional coverage with cross and transition bins; automated regression with Python-based log parsing and HTML dashboard generation.
-
-> **Bug-Injection Verification Flow** — Developed an intentional-bug injection methodology to validate environment detection capability; demonstrated end-to-end detect → debug → fix workflow with scoreboard-caught mismatches, automated regression reporting, and waveform-based root-cause analysis.
-
----
 
 <p align="center"><i>SystemVerilog · UVM · Questa</i></p>
